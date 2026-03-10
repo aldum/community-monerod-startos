@@ -1,9 +1,9 @@
-import { FileHelper, matches } from '@start9labs/start-sdk'
+import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const shape = matches.object({
-  dbSalvage: matches.boolean,
-  resync: matches.boolean,
+const shape = z.object({
+  dbSalvage: z.boolean().catch(false),
+  resync: z.boolean().catch(false),
 })
 
 export const storeJson = FileHelper.json(
@@ -13,8 +13,3 @@ export const storeJson = FileHelper.json(
   },
   shape,
 )
-
-export const storeDefaults = {
-  dbSalvage: false,
-  resync: false,
-}

@@ -1,11 +1,14 @@
+<p align="center">
+  <img src="icon.svg" alt="Mempool Logo" width="21%">
+</p>
+
 # Monero on StartOS
 
-> **Upstream docs:** <https://docs.getmonero.org/>
+> **Upstream docs:** <https://docs.getmonero.org>
 >
 > Everything not listed in this document should behave the same as upstream
-> Monero v0.18.4.5 ("Fluorine Fermi"). If a feature, setting, or behavior is
-> not mentioned here, the upstream documentation is accurate and fully
-> applicable.
+> Monero. If a feature, setting, or behavior is not mentioned here, the
+> upstream documentation is accurate and fully applicable.
 
 [Monero](https://github.com/monero-project/monero) is a private, decentralized cryptocurrency. This package runs two daemons — `monerod` (the full node) and `monero-wallet-rpc` (server-side wallet management) — and exposes all configuration through StartOS actions.
 
@@ -61,7 +64,7 @@ All persistent configuration lives in INI-format config files managed by StartOS
 
 On fresh install, StartOS writes default config files before the daemons start for the first time:
 
-- **Tor-only mode is enabled by default** — all traffic is routed through the StartOS Tor proxy at `10.0.3.1:9050`. Upstream Monero defaults to clearnet.
+- **Tor-only mode is enabled by default** — all traffic is routed through the StartOS Tor proxy at `tor.startos:9050`. Upstream Monero defaults to clearnet.
 - **DNS checkpoints are disabled** — upstream enables DNS checkpointing by default.
 - **Update checks are disabled** — StartOS manages package updates.
 - **ZMQ is disabled by default** — can be enabled via the Other Settings action.
@@ -122,15 +125,15 @@ These differ from upstream defaults and cannot be changed through the UI:
 
 ## Network Access and Interfaces
 
-| Interface      | Internal Port | External Port (LAN) | External Port (Tor) | Protocol | Purpose                             |
-| -------------- | ------------- | ------------------- | ------------------- | -------- | ----------------------------------- |
-| Peer (P2P)     | 18080         | 18080               | 18080               | TCP      | Block/transaction exchange          |
-| Restricted RPC | 18089         | 443 (SSL)           | 18089               | HTTP     | Wallet connections, read-only API   |
-| Wallet RPC     | 28088         | 28088 (SSL)         | 28088               | HTTP     | Server-side wallet management       |
-| ZMQ*           | 18082         | 18082               | 18082               | TCP      | Block/tx notifications              |
-| ZMQ Pub-Sub*   | 18083         | 18083               | 18083               | TCP      | Publish-subscribe                   |
+| Interface      | Internal Port | External Port (LAN) | External Port (Tor) | Protocol | Purpose                           |
+| -------------- | ------------- | ------------------- | ------------------- | -------- | --------------------------------- |
+| Peer (P2P)     | 18080         | 18080               | 18080               | TCP      | Block/transaction exchange        |
+| Restricted RPC | 18089         | 443 (SSL)           | 18089               | HTTP     | Wallet connections, read-only API |
+| Wallet RPC     | 28088         | 28088 (SSL)         | 28088               | HTTP     | Server-side wallet management     |
+| ZMQ\*          | 18082         | 18082               | 18082               | TCP      | Block/tx notifications            |
+| ZMQ Pub-Sub\*  | 18083         | 18083               | 18083               | TCP      | Publish-subscribe                 |
 
-*\*ZMQ interfaces only appear when ZMQ is enabled in Other Settings. They are not created by default.*
+_\*ZMQ interfaces only appear when ZMQ is enabled in Other Settings. They are not created by default._
 
 The full (unrestricted) RPC on port 18081 is **not exposed** as a StartOS interface. It is accessible only from within the container network. External wallet connections use the restricted RPC on port 18089.
 

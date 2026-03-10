@@ -1,16 +1,9 @@
-import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
+import { IMPOSSIBLE, VersionInfo, YAML } from '@start9labs/start-sdk'
 import { existsSync } from 'fs'
 import { readdir, readFile, rename, rm } from 'fs/promises'
-import { moneroConfFile } from '../../fileModels/monero.conf'
 import { walletRpcConfFile } from '../../fileModels/monero-wallet-rpc.conf'
-import {
-  moneroConfDefaults,
-  walletRpcConfDefaults,
-  torDefaults,
-  zmqPort,
-  zmqPubsubPort,
-  toTorSettings,
-} from '../../utils'
+import { moneroConfFile } from '../../fileModels/monero.conf'
+import { zmqPort, zmqPubsubPort } from '../../utils'
 
 interface OldCredentials {
   enabled: 'enabled' | 'disabled'
@@ -63,8 +56,8 @@ interface OldConfigYaml {
   }
 }
 
-export const v0_18_4_5_b1 = VersionInfo.of({
-  version: '0.18.4:5-beta.1',
+export const v_0_18_4_7_b0 = VersionInfo.of({
+  version: '0.18.4:7-beta.0',
   releaseNotes: {
     en_US:
       'Write directly to monero.conf and monero-wallet-rpc.conf. Removes config.yaml intermediate file.',
@@ -85,19 +78,12 @@ export const v0_18_4_5_b1 = VersionInfo.of({
         const walletCreds = rpc?.['wallet-rpc-credentials']
         const peerAddr = (p: OldPeer) => `${p.hostname}:${p.port}`
 
-        const toronly = tor?.toronly ?? torDefaults.toronly
         const gossipEnabled = p2p?.letneighborsgossip !== false
 
-        // Build monero.conf from old config
-        const confSettings: Record<string, any> = {
-          ...moneroConfDefaults,
-          ...toTorSettings({
-            toronly,
-            maxsocksconns: tor?.maxsocksconns ?? torDefaults.maxsocksconns,
-            maxonionconns: tor?.maxonionconns ?? torDefaults.maxonionconns,
-            dandelion: tor?.dandelion ?? torDefaults.dandelion,
-          }),
-        }
+        // Build monero.conf from old config — zod .catch() fills missing defaults
+        // Note: Tor settings are NOT migrated — Tor is now a separate service
+        // and the user must configure it via the Networking action after installing Tor.
+        const confSettings: Record<string, any> = {}
 
         if (p2p?.maxnumoutpeers != null) {
           confSettings['out-peers'] = p2p.maxnumoutpeers
@@ -134,8 +120,7 @@ export const v0_18_4_5_b1 = VersionInfo.of({
         if (!gossipEnabled) {
           confSettings['hide-my-port'] = 1
         }
-        confSettings['igd'] =
-          !gossipEnabled || toronly ? 'disabled' : undefined
+        confSettings['igd'] = !gossipEnabled ? 'disabled' : undefined
 
         if (p2p?.publicrpc) {
           confSettings['public-node'] = 1
@@ -173,10 +158,8 @@ export const v0_18_4_5_b1 = VersionInfo.of({
 
         await moneroConfFile.write(effects, confSettings as any)
 
-        // Build wallet-rpc conf
-        const walletSettings: Record<string, any> = {
-          ...walletRpcConfDefaults,
-        }
+        // Build wallet-rpc conf — zod .catch() fills missing defaults
+        const walletSettings: Record<string, any> = {}
         if (walletCreds?.enabled === 'enabled') {
           walletSettings['rpc-login'] =
             `${walletCreds.username}:${walletCreds.password}`
@@ -188,9 +171,9 @@ export const v0_18_4_5_b1 = VersionInfo.of({
         }
         await walletRpcConfFile.write(effects, walletSettings as any)
       } else {
-        // No old config — write defaults
-        await moneroConfFile.write(effects, moneroConfDefaults as any)
-        await walletRpcConfFile.write(effects, walletRpcConfDefaults as any)
+        // No old config — write defaults (zod .catch() fills all defaults)
+        await moneroConfFile.write(effects, {} as any)
+        await walletRpcConfFile.write(effects, {} as any)
       }
 
       // Remove old files

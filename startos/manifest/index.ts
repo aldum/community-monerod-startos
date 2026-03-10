@@ -1,15 +1,20 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { short, long, alertUninstall, alertRestore } from './i18n'
+import {
+  short,
+  long,
+  alertUninstall,
+  alertRestore,
+  torDescription,
+} from './i18n'
 
 export const manifest = setupManifest({
   id: 'monerod',
   title: 'Monero',
   license: 'bsd-3-clause',
-  wrapperRepo: 'https://github.com/kn0wmad/monerod-startos',
+  packageRepo: 'https://github.com/kn0wmad/monerod-startos/tree/update/040',
   upstreamRepo: 'https://github.com/monero-project/monero',
-  supportSite: 'https://github.com/monero-project/monero',
-  marketingSite: 'https://getmonero.org',
-  docsUrl: 'https://docs.getmonero.org',
+  marketingUrl: 'https://getmonero.org',
+  docsUrls: ['https://docs.getmonero.org'],
   donationUrl: null,
   description: { short, long },
   volumes: ['main', 'monerod', 'wallet'],
@@ -36,5 +41,14 @@ export const manifest = setupManifest({
     start: null,
     stop: null,
   },
-  dependencies: {},
+  dependencies: {
+    tor: {
+      description: torDescription,
+      optional: true,
+      metadata: {
+        title: 'Tor',
+        icon: 'https://raw.githubusercontent.com/Start9Labs/tor-startos/65faea17febc739d910e8c26ff4e61f6333487a8/icon.svg',
+      },
+    },
+  },
 })

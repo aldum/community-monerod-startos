@@ -122,6 +122,10 @@ const dict = {
   'This will delete all blockchain data and re-sync from the network. For pruned nodes, this means downloading the entire blockchain again, which could take days or weeks depending on hardware and network speed.': 118,
   'Restarting monerod. The blockchain database will be deleted and re-synced from the network.': 119,
   'The next time monerod starts, the blockchain database will be deleted and re-synced from the network.': 120,
+  'Daemon RPC Settings': 121,
+  'Configure Monero daemon RPC credentials': 122,
+  'Wallet RPC Settings': 123,
+  'Configure Monero wallet RPC credentials': 124,
 } as const
 
 export type I18nKey = keyof typeof dict

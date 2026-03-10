@@ -1,35 +1,38 @@
-import { FileHelper, matches } from '@start9labs/start-sdk'
+import { FileHelper, z } from '@start9labs/start-sdk'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { walletRpcConfDefaults } from '../utils'
+import { rpcRestrictedPort, walletRpcPort } from '../utils'
 
-const stringArray = matches.array(matches.string)
-const iniString = stringArray.map(([a]) => a).orParser(matches.string)
-const iniNatural = iniString.map((a) => Number(a)).orParser(matches.natural)
+const iniString = z
+  .union([z.array(z.string()).transform((a) => a.at(-1)!), z.string()])
+  .optional()
+  .catch(undefined)
+const iniNumber = z
+  .union([
+    z.array(z.string()).transform((a) => Number(a.at(-1))),
+    z.string().transform(Number),
+    z.number(),
+  ])
+  .optional()
+  .catch(undefined)
 
-const shape = matches.object({
-  'wallet-dir': iniString.onMismatch(walletRpcConfDefaults['wallet-dir']),
-  'log-file': iniString.onMismatch(walletRpcConfDefaults['log-file']),
-  'max-log-file-size': iniNatural.onMismatch(
-    walletRpcConfDefaults['max-log-file-size'],
-  ),
-  'max-log-files': iniNatural.onMismatch(
-    walletRpcConfDefaults['max-log-files'],
-  ),
-  'trusted-daemon': iniNatural.onMismatch(
-    walletRpcConfDefaults['trusted-daemon'],
-  ),
-  'daemon-port': iniNatural.onMismatch(walletRpcConfDefaults['daemon-port']),
-  'confirm-external-bind': iniNatural.onMismatch(
-    walletRpcConfDefaults['confirm-external-bind'],
-  ),
-  'rpc-bind-ip': iniString.onMismatch(walletRpcConfDefaults['rpc-bind-ip']),
-  'rpc-bind-port': iniNatural.onMismatch(
-    walletRpcConfDefaults['rpc-bind-port'],
-  ),
+const shape = z.object({
+  // Enforced
+  'wallet-dir': z.literal('/home/monero/wallet').catch('/home/monero/wallet'),
+  'log-file': z
+    .literal('/home/monero/wallet/logs/monero-wallet-rpc.log')
+    .catch('/home/monero/wallet/logs/monero-wallet-rpc.log'),
+  'max-log-file-size': z.literal(10000000).catch(10000000),
+  'max-log-files': z.literal(2).catch(2),
+  'trusted-daemon': z.literal(1).catch(1),
+  'daemon-port': z.literal(rpcRestrictedPort).catch(rpcRestrictedPort),
+  'confirm-external-bind': z.literal(1).catch(1),
+  'rpc-bind-ip': z.literal('0.0.0.0').catch('0.0.0.0'),
+  'rpc-bind-port': z.literal(walletRpcPort).catch(walletRpcPort),
   // Conditional
-  'rpc-login': iniString.optional().onMismatch(undefined),
-  'disable-rpc-login': iniNatural.optional().onMismatch(undefined),
-  'daemon-login': iniString.optional().onMismatch(undefined),
+  'rpc-login': iniString,
+  'disable-rpc-login': iniNumber,
+  'daemon-login': iniString,
 })
 
 function onWrite(a: unknown): any {
@@ -51,8 +54,85 @@ export const walletRpcConfFile = FileHelper.ini(
   },
   shape,
   { bracketedArray: false },
-  {
-    onRead: (a) => a,
-    onWrite,
-  },
+  { onRead: (a) => a, onWrite },
 )
+
+// ── InputSpec & read helper ─────────────────────────────────────────
+
+const { InputSpec, Value, Variants } = sdk
+
+const alphanumUnderscore = [
+  {
+    regex: '^[a-zA-Z0-9_]+$',
+    description: i18n(
+      'Must be alphanumeric and/or can contain an underscore',
+    ),
+  },
+]
+
+export const walletRpcConfigSpec = InputSpec.of({
+  'wallet-rpc-credentials': Value.union({
+    name: i18n('Wallet RPC Credentials'),
+    description: i18n(
+      'Enable or disable a username and password to access the Monero wallet RPC. Default: Disabled',
+    ),
+    default: 'disabled',
+    variants: Variants.of({
+      disabled: {
+        name: i18n('Disabled'),
+        spec: InputSpec.of({}),
+      },
+      enabled: {
+        name: i18n('Enabled'),
+        spec: InputSpec.of({
+          username: Value.text({
+            name: i18n('Wallet RPC Username'),
+            description: i18n(
+              "The username for connecting to Monero's wallet RPC interface",
+            ),
+            warning: i18n(
+              "Changing this value will necessitate a restart of all services that depend on Monero's wallet RPC.",
+            ),
+            required: true,
+            default: 'monero_wallet',
+            patterns: alphanumUnderscore,
+          }),
+          password: Value.text({
+            name: i18n('Wallet RPC Password'),
+            description: i18n(
+              "The password for connecting to Monero's wallet RPC interface",
+            ),
+            warning: i18n(
+              "Changing this value will necessitate a restart of all services that depend on Monero's wallet RPC.",
+            ),
+            required: true,
+            default: { charset: 'a-z,A-Z,0-9', len: 22 },
+            patterns: alphanumUnderscore,
+            masked: true,
+            generate: { charset: 'a-z,A-Z,0-9', len: 22 },
+          }),
+        }),
+      },
+    }),
+  }),
+})
+
+export async function readWalletRpcForForm(effects: any) {
+  const conf = await walletRpcConfFile.read().const(effects)
+  if (!conf?.['rpc-login']) {
+    return { 'wallet-rpc-credentials': { selection: 'disabled' as const, value: {} } }
+  }
+  const colonIdx = conf['rpc-login'].indexOf(':')
+  if (colonIdx <= 0) {
+    return { 'wallet-rpc-credentials': { selection: 'disabled' as const, value: {} } }
+  }
+  return {
+    'wallet-rpc-credentials': {
+      selection: 'enabled' as const,
+      value: {
+        username: conf['rpc-login'].substring(0, colonIdx),
+        password: conf['rpc-login'].substring(colonIdx + 1),
+      },
+    },
+  }
+}

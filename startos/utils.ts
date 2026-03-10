@@ -6,8 +6,6 @@ export const zmqPort = 18082
 export const zmqPubsubPort = 18083
 export const walletRpcPort = 28088
 
-export const torProxyAddress = '10.0.3.1:9050'
-
 export interface TorPreferences {
   toronly: boolean
   maxsocksconns: number
@@ -22,72 +20,10 @@ export const torDefaults: TorPreferences = {
   dandelion: true,
 }
 
-export const moneroConfDefaults = {
-  // Static
-  'data-dir': '/home/monero/.bitmonero',
-  'log-level': '0,blockchain:INFO',
-  'log-file': '/home/monero/.bitmonero/logs/monerod.log',
-  'max-log-file-size': 10000000,
-  'max-log-files': 2,
-  'p2p-bind-ip': '0.0.0.0',
-  'p2p-bind-port': p2pPort,
-  'rpc-bind-ip': '0.0.0.0',
-  'rpc-bind-port': rpcPort,
-  'confirm-external-bind': 1,
-  'rpc-access-control-origins': '*',
-  'rpc-restricted-bind-ip': '0.0.0.0',
-  'rpc-restricted-bind-port': rpcRestrictedPort,
-  'db-sync-mode': 'safe:sync',
-  'enforce-dns-checkpointing': 0,
-  'disable-dns-checkpoints': 1,
-  'check-updates': 'disabled',
-  // Direct-mapped (user configurable)
-  'out-peers': 12,
-  'in-peers': 24,
-  'limit-rate-up': 2048,
-  'limit-rate-down': 8192,
-  'max-txpool-weight': 648000000,
-  // Conditional (undefined = omitted from file)
-  'rpc-login': undefined as string | undefined,
-  'no-zmq': 1 as number | undefined,
-  'zmq-rpc-bind-ip': undefined as string | undefined,
-  'zmq-rpc-bind-port': undefined as number | undefined,
-  'zmq-pub': undefined as string | undefined,
-  'disable-rpc-ban': 1 as number | undefined,
-  'hide-my-port': undefined as number | undefined,
-  igd: 'disabled' as string | undefined,
-  'public-node': undefined as number | undefined,
-  'prune-blockchain': undefined as number | undefined,
-  'pad-transactions': 1 as number | undefined,
-  'ban-list': '/home/monero/ban_list.txt' as string | undefined,
-  'block-notify': undefined as string | undefined,
-  'add-peer': undefined as string[] | undefined,
-  'add-priority-node': undefined as string[] | undefined,
-  'add-exclusive-node': undefined as string[] | undefined,
-  // Tor composite (default: toronly mode)
-  'tx-proxy': `tor,${torProxyAddress},${torDefaults.maxsocksconns}` as
-    | string
-    | undefined,
-  proxy: torProxyAddress as string | undefined,
-  'anonymous-inbound': undefined as string | undefined,
-} as const
-
-export const walletRpcConfDefaults = {
-  'wallet-dir': '/home/monero/wallet',
-  'log-file': '/home/monero/wallet/logs/monero-wallet-rpc.log',
-  'max-log-file-size': 10000000,
-  'max-log-files': 2,
-  'trusted-daemon': 1,
-  'daemon-port': rpcRestrictedPort,
-  'confirm-external-bind': 1,
-  'rpc-bind-ip': '0.0.0.0',
-  'rpc-bind-port': walletRpcPort,
-  'rpc-login': undefined as string | undefined,
-  'disable-rpc-login': 1 as number | undefined,
-  'daemon-login': undefined as string | undefined,
-} as const
-
-export function toTorSettings(prefs: TorPreferences) {
+export function toTorSettings(
+  prefs: TorPreferences,
+  torProxyAddress: string,
+) {
   if (!prefs.toronly) {
     return {
       'tx-proxy': undefined,

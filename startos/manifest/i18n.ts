@@ -16,3 +16,8 @@ export const alertRestore = {
   en_US:
     'Restoring Monero will overwrite its current data. You will lose any transactions recorded in watch-only wallets, and any funds you have received to the hot wallet since the last backup.',
 }
+
+export const torDescription = {
+  en_US:
+    'Required for Tor-only mode, onion peer connectivity, and transaction privacy via Tor proxy.',
+}

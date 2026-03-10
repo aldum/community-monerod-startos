@@ -21,10 +21,11 @@ export const resyncBlockchain = sdk.Action.withoutInput(
   async ({ effects }) => {
     await storeJson.merge(effects, { resync: true })
 
-    const started = (await sdk.getStatus(effects, { packageId: 'monerod' }))
-      .started
+    const status = await sdk
+      .getStatus(effects, { packageId: 'monerod' })
+      .once()
 
-    if (started) {
+    if (status?.started) {
       await sdk.restart(effects)
       return {
         version: '1',
