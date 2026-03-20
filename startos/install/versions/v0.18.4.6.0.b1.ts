@@ -56,8 +56,8 @@ interface OldConfigYaml {
   }
 }
 
-export const v_0_18_4_6_0_b0 = VersionInfo.of({
-  version: '0.18.4.6:0-beta.0',
+export const v_0_18_4_6_0_b1 = VersionInfo.of({
+  version: '0.18.4.6:0-beta.1',
   releaseNotes: {
     en_US: 'Update Monero to 0.18.4.6',
   },
