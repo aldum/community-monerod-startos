@@ -56,10 +56,10 @@ interface OldConfigYaml {
   }
 }
 
-export const v_0_18_4_6_0_b1 = VersionInfo.of({
-  version: '0.18.4.6:0-beta.1',
+export const v_0_18_4_6_0_b2 = VersionInfo.of({
+  version: '0.18.4.6:0-beta.2',
   releaseNotes: {
-    en_US: 'Update Monero to 0.18.4.6',
+    en_US: 'Update to StartOS SDK beta.65',
   },
   migrations: {
     up: async ({ effects }) => {

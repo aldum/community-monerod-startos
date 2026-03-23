@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.svg" alt="Mempool Logo" width="21%">
+  <img src="icon.svg" alt="Monero Logo" width="21%">
 </p>
 
 # Monero on StartOS
@@ -34,8 +34,8 @@
 
 | Property         | Value                                                                    |
 | ---------------- | ------------------------------------------------------------------------ |
-| monerod image    | `ghcr.io/sethforprivacy/simple-monerod:v0.18.4.5` (unmodified)           |
-| wallet-rpc image | `ghcr.io/sethforprivacy/simple-monero-wallet-rpc:v0.18.4.5` (unmodified) |
+| monerod image    | `ghcr.io/sethforprivacy/simple-monerod` (unmodified)           |
+| wallet-rpc image | `ghcr.io/sethforprivacy/simple-monero-wallet-rpc` (unmodified) |
 | Architectures    | x86_64, aarch64                                                          |
 | Entrypoint       | Bypassed — StartOS calls the binaries directly via config file           |
 
@@ -268,10 +268,9 @@ See [docs/wallet-integrations.md](docs/wallet-integrations.md) for step-by-step 
 
 ```yaml
 package_id: monerod
-upstream_version: 0.18.4.5
 images:
-  monerod: ghcr.io/sethforprivacy/simple-monerod:v0.18.4.5
-  wallet-rpc: ghcr.io/sethforprivacy/simple-monero-wallet-rpc:v0.18.4.5
+  monerod: ghcr.io/sethforprivacy/simple-monerod
+  wallet-rpc: ghcr.io/sethforprivacy/simple-monero-wallet-rpc
 architectures: [x86_64, aarch64]
 volumes:
   monerod: /home/monero/.bitmonero
