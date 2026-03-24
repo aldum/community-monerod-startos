@@ -1,9 +1,9 @@
 import { IMPOSSIBLE, VersionInfo, YAML } from '@start9labs/start-sdk'
 import { existsSync } from 'fs'
 import { readdir, readFile, rename, rm } from 'fs/promises'
-import { walletRpcConfFile } from '../../fileModels/monero-wallet-rpc.conf'
-import { moneroConfFile } from '../../fileModels/monero.conf'
-import { zmqPort, zmqPubsubPort } from '../../utils'
+import { walletRpcConfFile } from '../fileModels/monero-wallet-rpc.conf'
+import { moneroConfFile } from '../fileModels/monero.conf'
+import { zmqPort, zmqPubsubPort } from '../utils'
 
 interface OldCredentials {
   enabled: 'enabled' | 'disabled'
@@ -56,8 +56,8 @@ interface OldConfigYaml {
   }
 }
 
-export const v_0_18_4_6_0_b2 = VersionInfo.of({
-  version: '0.18.4.6:0-beta.2',
+export const v_0_18_4_6_0_b3 = VersionInfo.of({
+  version: '0.18.4.6:0-beta.3',
   releaseNotes: {
     en_US: 'Update to StartOS SDK beta.65',
     es_ES: 'Actualización a StartOS SDK beta.65',

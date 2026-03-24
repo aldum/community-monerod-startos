@@ -5,15 +5,15 @@ import { sdk } from '../sdk'
 
 export const taskInit = sdk.setupOnInit(async (effects) => {
   await Promise.all([
-    moneroConfFile.write(effects, {
+    moneroConfFile.merge(effects, {
       'no-zmq': 1,
       'disable-rpc-ban': 1,
       igd: 'disabled',
       'ban-list': '/home/monero/ban_list.txt',
     } as any),
-    walletRpcConfFile.write(effects, {
+    walletRpcConfFile.merge(effects, {
       'disable-rpc-login': 1,
     } as any),
-    storeJson.write(effects, {} as any),
+    storeJson.merge(effects, {}),
   ])
 })
