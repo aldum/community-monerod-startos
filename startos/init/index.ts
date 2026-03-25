@@ -7,9 +7,9 @@ import { restoreInit } from '../backups'
 import { taskInit } from './taskInit'
 
 export const init = sdk.setupInit(
-  taskInit,
   restoreInit,
   versionGraph,
+  taskInit,
   setInterfaces,
   setDependencies,
   actions,
