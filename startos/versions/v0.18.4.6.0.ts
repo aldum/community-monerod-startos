@@ -56,8 +56,8 @@ interface OldConfigYaml {
   }
 }
 
-export const v_0_18_4_6_0_b3 = VersionInfo.of({
-  version: '0.18.4.6:0-beta.3',
+export const v_0_18_4_6_0 = VersionInfo.of({
+  version: '0.18.4.6:0',
   releaseNotes: {
     en_US: 'Update to StartOS SDK beta.65',
     es_ES: 'Actualización a StartOS SDK beta.65',
